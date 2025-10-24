@@ -14,7 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      approval_steps: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          comments: string | null
+          created_at: string | null
+          id: string
+          invoice_id: string
+          status: string | null
+          step_type: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          invoice_id: string
+          status?: string | null
+          step_type: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          invoice_id?: string
+          status?: string | null
+          step_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_steps_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_steps_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string | null
+          created_by: string
+          description: string | null
+          file_url: string | null
+          id: string
+          invoice_number: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          invoice_number: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          invoice_number?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          role: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id: string
+          role?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          role?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
