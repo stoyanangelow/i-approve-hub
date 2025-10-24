@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { User } from "@supabase/supabase-js";
+import { Shield } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +20,7 @@ const Dashboard = () => {
         return;
       }
       setUser(session.user);
+      checkAdminStatus(session.user.id);
     };
 
     checkAuth();
@@ -26,11 +29,30 @@ const Dashboard = () => {
       setUser(session?.user ?? null);
       if (!session) {
         navigate("/auth");
+      } else {
+        checkAdminStatus(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!error && data) {
+        setIsAdmin(true);
+      }
+    } catch (error) {
+      console.error("Failed to check admin status:", error);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -87,6 +109,24 @@ const Dashboard = () => {
             Pending Approvals
           </Button>
         </div>
+
+        {isAdmin && (
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Shield className="h-6 w-6 text-primary" />
+              <h3 className="text-xl font-semibold">Admin Tools</h3>
+            </div>
+            <Button
+              onClick={() => navigate("/users")}
+              variant="outline"
+              className="h-24 w-full text-lg"
+              size="lg"
+            >
+              <Shield className="mr-2 h-5 w-5" />
+              User Management
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );

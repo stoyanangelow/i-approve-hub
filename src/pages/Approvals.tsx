@@ -41,14 +41,27 @@ const Approvals = () => {
   }, [navigate]);
 
   const loadUserRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
 
-    if (!error && data) {
-      setUserRole(data.role);
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        // Check for owner or finance role
+        const roles = data.map(r => r.role);
+        if (roles.includes("admin")) {
+          setUserRole("admin");
+        } else if (roles.includes("finance")) {
+          setUserRole("finance");
+        } else if (roles.includes("owner")) {
+          setUserRole("owner");
+        }
+      }
+    } catch (error: any) {
+      console.error("Failed to load user role:", error);
     }
   };
 
